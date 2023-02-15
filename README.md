@@ -12,7 +12,7 @@ For running an ML job you will need:
 * Compute
 * Data asset (optional)
 
-### Create Azure ML Workspace
+### Create Azure ML workspace
 
 In [Azure Portal](https://portal.azure.com/) 
 
@@ -21,12 +21,12 @@ In [Azure Portal](https://portal.azure.com/)
 * Workspace name: **learn-mlops**
 * Create > Go to resource > Launch studio
 
-### Create Compute
+### Create Compute instance
 
 In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
 
 * Compute > + New
-* Compute name: **tmp-instance** (must be unique in the whole region)
+* Compute name: **cheapest-instance** (must be unique in the whole region)
 * Virtual machine size: **Standard_A1_v2** (1 cores, 2 GB RAM, 10 GB disk)
 * Create > wait for it...
 
@@ -92,3 +92,16 @@ az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subsc
 * Name: **AZURE_CREDENTIALS**
 * Secret: **\<output from the previous command\>**
 
+### Create Compute cluster
+
+In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
+
+* Compute > Compute clusters > + New
+* Virtual machine size: **Standard_A1_v2** (1 cores, 2 GB RAM, 10 GB disk)
+* Next
+* Compute name: **cheapest-cluster** (must be unique in the whole region)
+* Create > wait for it...
+
+Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
+
+> **important**: do not forget to stop it after you're done!
