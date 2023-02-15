@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# mlflow
+mlruns/
+
+# azure
+azure_credentials.json

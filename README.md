@@ -4,7 +4,15 @@
 
 * Azure subscription (free for 1 month, $200 of credit)
 
-## Create Azure ML Workspace
+## Create Azure resources
+
+For running an ML job you will need:
+
+* ML workspace
+* Compute
+* Data asset (optional)
+
+### Create Azure ML Workspace
 
 In [Azure Portal](https://portal.azure.com/) 
 
@@ -13,7 +21,7 @@ In [Azure Portal](https://portal.azure.com/)
 * Workspace name: **learn-mlops**
 * Create > Go to resource > Launch studio
 
-## Create Compute
+### Create Compute
 
 In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
 
@@ -26,7 +34,13 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
 
 > **important**: do not forget to stop it after you're done!
 
-## Install `azure-cli`
+### Create Data asset (optional)
+
+TODO...
+
+## Create a ML job using `azure-cli`
+
+### Install `azure-cli`
 
 1. download MS keyring
     ```
@@ -49,7 +63,7 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
     az extension add -n ml -y
     ```
 
-## Create a ML job
+### Create an ML job
 
 1. log into azure (opens a web page)
 
@@ -61,3 +75,20 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
     ```
     az ml job create -g learn -w learn-mlops -f src/job.yml
     ```
+
+## Use GH Actions for model training
+
+### Create Service Principal
+
+In [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) register a new app or create a service principal directly with `azure-cli`
+
+```
+az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/learn-mlops
+```
+
+### Create GitHub Action Secret
+
+* [mslearn-mlops  settings](https://github.com/ficinator/mslearn-mlops/settings/secrets/actions) > New repository secret
+* Name: **AZURE_CREDENTIALS**
+* Secret: **\<output from the previous command\>**
+
