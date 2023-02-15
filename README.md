@@ -4,7 +4,7 @@
 
 * Azure subscription (free for 1 month, $200 of credit)
 
-## Create Azure resources
+## 0: Create Azure resources
 
 For running an ML job you will need:
 
@@ -12,7 +12,7 @@ For running an ML job you will need:
 * Compute
 * Data asset (optional)
 
-### Create Azure ML workspace
+### 0.1: Create Azure ML workspace
 
 In [Azure Portal](https://portal.azure.com/) 
 
@@ -21,7 +21,7 @@ In [Azure Portal](https://portal.azure.com/)
 * Workspace name: **learn-mlops**
 * Create > Go to resource > Launch studio
 
-### Create Compute instance
+### 0.2: Create Compute instance
 
 In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
 
@@ -34,13 +34,13 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
 
 > **important**: do not forget to stop it after you're done!
 
-### Create Data asset (optional)
+### 0.3: Create Data asset (optional)
 
 TODO...
 
-## Create a ML job using `azure-cli`
+## 1: Create a ML job using `azure-cli`
 
-### Install `azure-cli`
+### 1.1: Install `azure-cli`
 
 1. download MS keyring
     ```
@@ -63,7 +63,7 @@ TODO...
     az extension add -n ml -y
     ```
 
-### Create an ML job
+### 1.2: Create an ML job
 
 1. log into azure (opens a web page)
 
@@ -76,23 +76,27 @@ TODO...
     az ml job create -g learn -w learn-mlops -f src/job.yml
     ```
 
-## Use GH Actions for model training
+## 2: Use GH Actions for model training
 
-### Create Service Principal
+### 2.1: Create Service Principal
 
 In [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) register a new app or create a service principal directly with `azure-cli`
 
 ```
-az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/learn-mlops
+az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/learn-mlops --sdk-auth
 ```
 
-### Create GitHub Action Secret
+> no idea what `--sdk-auth` means, but it is deprecated
 
-* [mslearn-mlops  settings](https://github.com/ficinator/mslearn-mlops/settings/secrets/actions) > New repository secret
+### 2.2: Create GitHub Action Secret
+
+* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings/secrets/actions) > New repository secret
 * Name: **AZURE_CREDENTIALS**
 * Secret: **\<output from the previous command\>**
 
-### Create Compute cluster
+### 2.3: Create Compute cluster
+
+For some reason the service principal is only allowed to run jobs in compute cluster, not instance.
 
 In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
 
@@ -105,3 +109,7 @@ In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7
 Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 
 > **important**: do not forget to stop it after you're done!
+
+### 2.4: Run GH Action
+
+* [mslearn-mlops action](https://github.com/ficinator/mslearn-mlops/actions/workflows/02-manual-trigger-job.yml) > Run workflow > hopefully it runs
