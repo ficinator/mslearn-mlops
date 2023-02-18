@@ -113,3 +113,18 @@ Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 ### 2.4: Run GH Action
 
 * [mslearn-mlops action](https://github.com/ficinator/mslearn-mlops/actions/workflows/02-manual-trigger-job.yml) > Run workflow > hopefully it runs
+
+## 3: Trigger model training on PR
+
+### 3.1: Create branch protection rule
+
+* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > Add branch protection rule
+* Branch name pattern: **main**
+* Require a pull request before merging > Require approvals
+* Create
+
+### 3.2: Create workflow triggered on PR creation
+
+```yml
+on: [pull_request]
+```
