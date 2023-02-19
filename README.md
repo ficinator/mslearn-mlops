@@ -131,9 +131,70 @@ on: [pull_request]
 
 ## 4: Trigger linting and unit testing on PR
 
-### 4.1: 
+### 4.1: Python linting in vs code
 
+In the UI:
+
+* `pip install flake8 autopep8`
+* Extensions > Python (`ms-python.python`) > Install
+* Settings (cogwheel)
+* Python > Linting: **Enabled**, **Flake8 Enabled**, **Lint On Save**
+* Python > Testing: **Pytest Enabled** 
+* Ctrl + Shift + P > Preferences: Configure Language Specific Settings... > Python
+* Editor: **Format On Save**, **Default Formatter: Pylance**
+
+or in the JSON:
+
+Ctrl + Shift + P > Preferences: Open User Settings (JSON)
+
+and add the following properties:
+
+```json
+{
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "python.testing.pytestEnabled": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "python.linting.flake8Enabled": true
+}
+
+```
+
+### 4.2: Update code checks workflow
+
+```yml
+name: Code checks
+
+on: [pull_request]
+
+jobs:
+  linting:
+    ...
+    steps:
+    - ...
+    - name: Install Flake8
+      run: python -m pip install flake8
+    - name: Run linting tests
+      run: flake8 src/model/
+
+  unit-tests:
+    ...
+    steps:
+    - ...
+    - name: Install requirements
+      run: python -m pip install -r requirements.txt
+    - name: Run unit tests
+      run: pytest
+```
+
+### 4.3: Add jobs to branch protection rule
+
+The above created jobs `linting` and `unit-tests` must be specified in the required status checks inside the protection rule for the main branch
 
 * [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > main branch protection rule
 * Require status checks to pass before merging > Require branches to be up to date before merging 
-* Status checks that are required: ****
+* Status checks that are required: **linting**, **unit-tests**
