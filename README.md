@@ -114,7 +114,7 @@ Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 
 * [mslearn-mlops action](https://github.com/ficinator/mslearn-mlops/actions/workflows/02-manual-trigger-job.yml) > Run workflow > hopefully it runs
 
-## 3: Trigger model training on PR
+## 3: Trigger workflow on PR
 
 ### 3.1: Create branch protection rule
 
@@ -128,3 +128,12 @@ Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 ```yml
 on: [pull_request]
 ```
+
+## 4: Trigger linting and unit testing on PR
+
+### 4.1: 
+
+
+* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > main branch protection rule
+* Require status checks to pass before merging > Require branches to be up to date before merging 
+* Status checks that are required: ****
