@@ -18,7 +18,7 @@ In [Azure Portal](https://portal.azure.com/)
 
 * Create a resource > Azure Machine learning
 * Resource group: **learn**
-* Workspace name: **learn-mlops**
+* Workspace name: **mlops**
 * Create > Go to resource > Launch studio
 
 ### 0.2: Create Compute instance
@@ -36,7 +36,18 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
 
 ### 0.3: Create Data asset (optional)
 
-TODO...
+In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
+
+* Data > (Data assets) > Create
+* Name: **diabetes-dev-dir**
+* Type: **uri_folder**
+* Next
+* From local files > Next
+* Datastore: **workspaceblobstore**
+* Next
+* Upload > Upload folder: `experimentation/data` > Next
+* Create
+
 
 ## 1: Create a ML job using `azure-cli`
 
@@ -73,7 +84,7 @@ TODO...
 
 2. run the job
     ```
-    az ml job create -g learn -w learn-mlops -f src/job.yml
+    az ml job create -g learn -w mlops -f src/job.yml
     ```
 
 ## 2: Use GH Actions for model training
@@ -83,7 +94,7 @@ TODO...
 In [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) register a new app or create a service principal directly with `azure-cli`
 
 ```
-az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/learn-mlops --sdk-auth
+az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops --sdk-auth
 ```
 
 > no idea what `--sdk-auth` means, but it is deprecated
@@ -92,7 +103,7 @@ az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subsc
 
 * [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings/secrets/actions) > New repository secret
 * Name: **AZURE_CREDENTIALS**
-* Secret: **\<output from the previous command\>**
+* Secret: [**\<output from the previous command\>**](#2.1:-create-service-principal)
 
 ### 2.3: Create Compute cluster
 
@@ -198,3 +209,19 @@ The above created jobs `linting` and `unit-tests` must be specified in the requi
 * [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > main branch protection rule
 * Require status checks to pass before merging > Require branches to be up to date before merging 
 * Status checks that are required: **linting**, **unit-tests**
+
+## 5: Use GH environments
+
+### 5.1: Create an environment
+
+* [mslearn-mlops settings ](https://github.com/ficinator/mslearn-mlops/settings) > Environments > New environment
+* Name: **dev**
+* Configure environment
+* Add Secret
+* Name: **AZURE_CREDENTIALS**
+* Value: [**\<output from the create service principal command\>**](#2.1:-create-service-principal)
+
+### 5.2: Create production environment with production data
+
+* create production environment **prod** like in the [previous step](#5.1:-create-an-environment)
+* create production data asset **diabetes-prod-dir** similar to [data asset for dev](#0.3:-create-data-asset-(optional))
