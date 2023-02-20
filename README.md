@@ -225,6 +225,12 @@ The above created jobs `linting` and `unit-tests` must be specified in the requi
 
 ### 5.1: Create an environment
 
+One can configure an environment with:
+* **protection rules**: somebody must explicitly approve before the job runs in this env
+* **variables**: like repo variables, but available only in the env
+* **secrets**: like repo secrets, but available only in the env
+
+Steps:
 * [mslearn-mlops settings ](https://github.com/ficinator/mslearn-mlops/settings) > Environments > New environment
 * Name: **dev**
 * Configure environment
@@ -236,3 +242,47 @@ The above created jobs `linting` and `unit-tests` must be specified in the requi
 
 * create production environment **prod** like in the [previous step](#5.1:-create-an-environment)
 * create production data asset **diabetes-prod-dir** similar to [data asset for dev](#0.3:-create-data-asset-(optional))
+
+### 5.3: Create new ML job yaml files
+
+To use different data asset in each job, create an ML job file for each environment
+
+> TODO: check if one can reuse parts of ML jobs in the [docs](https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-overview)
+
+### 5.4: Create GH Action workflow
+
+It will run two jobs on push to main branch: one for *dev* and other for *prod* environment.
+
+The *prod* job runs only if the *dev* job finishes successfully (ML job ran successfully too). To do so, one must add
+* `needs` keyword to specify dependencies of the job
+* add `--stream` option to the ML job command to forward its output to GH
+
+```yml
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  experiment:
+    ...
+    environment: dev
+    steps:
+    - ...
+      run: |
+        az ml job create \
+        --file src/job-dev.yml \
+        ...
+        --stream
+
+  production:
+    ...
+    environment: prod
+    needs: experiment
+    steps:
+    - ...
+      run: |
+        az ml job create \
+        --file src/job-prod.yml \
+        ...
+```
