@@ -249,9 +249,22 @@ To use different data asset in each job, create an ML job file for each environm
 
 > TODO: check if one can reuse parts of ML jobs in the [docs](https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-overview)
 
+```yml
+inputs:
+  training_data: 
+    type: uri_folder
+    path: azureml:diabetes-dev-dir:1
+    mode: ro_mount
+  reg_rate: 0.01
+environment: azureml:AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest
+compute: azureml:cheapest-cluster
+experiment_name: diabetes-dev-data-example
+description: Train a classification model on diabetes data using a registered dataset as input.
+```
+
 ### 5.4: Create GH Action workflow
 
-It will run two jobs on push to main branch: one for *dev* and other for *prod* environment.
+It will run two jobs on push to main branch: one for *dev* and other for *prod* environment. The env secrets can be accessed the same way as repo secrets, e.g. `${{secrets.AZURE_CREDENTIALS}}`
 
 The *prod* job runs only if the *dev* job finishes successfully (ML job ran successfully too). To do so, one must add
 * `needs` keyword to specify dependencies of the job
@@ -286,3 +299,67 @@ jobs:
         --file src/job-prod.yml \
         ...
 ```
+
+## 6: Deploy the model
+
+Can follow [this guide](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-mlflow-models-online-endpoints?tabs=cli) or read further...
+
+To configure the default resource group and workspace run
+
+```
+az configure --defaults workspace=mlops group=learn
+```
+
+Now they can be ommited from subsequent `azure-cli` commands.
+
+### 6.1.: Register a model
+
+In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+
+* Models > Register (From a job output)
+* check the latest `diabetes-prod-data-example` job > Next > Next
+* Name: **diabetes-classifier**
+* Next > Register
+
+In `azure-cli`:
+
+```
+az ml model create --name sklearn-diabetes --type mlflow_model --path azureml://jobs/<run_id>/outputs/artifacts/model
+```
+
+
+### 6.2: Create an online (real-time) endpoint
+
+In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+
+* Endpoints > (Real-time endpoints) > Create (Real-time endpoint (quick))
+* Select a model: **sklearn-diabetes**
+* Virtual machine: **Standard_DS1_v2 (1 core, 3.5 GB RAM, 7 GB disk)**
+* Endpoint name: **mlops-diabetes**
+* Deployment name: **sklearn-diabetes-1**
+* Deploy > wait for it...
+
+In `azure-cli`:
+
+```
+az ml online-endpoint create --name mlops-diabetes
+az ml online-deployment create --file src/deployment.yml --all-traffic
+```
+
+### 6.3: Invoke the endpoint
+
+In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+
+* Endpoints > mlops-diabetes > Test
+* copy the content of `experimentation/sample-request.json` file
+* Test
+
+In `azure-cli`:
+
+```
+az ml online-endpoint invoke --name mlops-diabetes --request-file experimentation/sample-request.json
+```
+
+### 6.4: Put everything into GH Action workflow
+
+TODO...
