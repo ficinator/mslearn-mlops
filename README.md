@@ -48,8 +48,19 @@ In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7
 * Upload > Upload folder: `experimentation/data` > Next
 * Create
 
+Now its first version can be referenced in the ML job input as `azureml:diabetes-dev-dir:1`:
 
-## 1: Create a ML job using `azure-cli`
+```yml
+inputs:
+  training_data: 
+    type: uri_folder
+    path: azureml:diabetes-dev-dir:1
+    mode: ro_mount
+```
+
+## 1: Create an ML job
+
+We'll use `azure-cli` this time.
 
 ### 1.1: Install `azure-cli`
 

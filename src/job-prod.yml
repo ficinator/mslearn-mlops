@@ -6,10 +6,11 @@ command: >-
   --reg_rate ${{inputs.reg_rate}}
 inputs:
   training_data: 
-    type: uri_folder 
-    path: ../experimentation/data
+    type: uri_folder
+    path: azureml:diabetes-prod-dir:1
+    mode: ro_mount
   reg_rate: 0.01
 environment: azureml:AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest
 compute: azureml:cheapest-cluster
-experiment_name: diabetes-data-example
-description: Train a classification model on diabetes data using a local folder as input.
+experiment_name: diabetes-prod-data-example
+description: Train a classification model on diabetes data using a registered dataset as input.

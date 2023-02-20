@@ -20,7 +20,7 @@ jobs:
         creds: ${{secrets.AZURE_CREDENTIALS}}
     - name: Trigger ML job
       run: |
-        az ml job create -g learn -w mlops -f src/job.yml
+        az ml job create -g learn -w mlops -f src/job-dev.yml
 
   production:
     runs-on: ubuntu-latest
@@ -36,4 +36,4 @@ jobs:
         creds: ${{secrets.AZURE_CREDENTIALS}}
     - name: Trigger ML job
       run: |
-        az ml job create -g learn -w mlops -f src/job.yml
+        az ml job create -g learn -w mlops -f src/job-prod.yml
