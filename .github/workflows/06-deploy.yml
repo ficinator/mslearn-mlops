@@ -6,6 +6,7 @@ on:
 jobs:
   create-endpoint:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
     - name: Check out repo
       uses: actions/checkout@main
@@ -20,6 +21,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    environment: prod
     needs: create-endpoint
     steps:
     - name: Check out repo
@@ -35,6 +37,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    environment: prod
     needs: deploy
     steps:
     - name: Check out repo
