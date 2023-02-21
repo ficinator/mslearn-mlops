@@ -1,3 +1,8 @@
+[Azure Portal]: https://portal.azure.com/
+[Azure ML Studio workspace]: https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops
+[Azure Active Directory]: https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps
+[mslearn-mlops settings]: https://github.com/ficinator/mslearn-mlops/settings
+
 # MLOps in Azure
 
 ## Prerequisites
@@ -14,7 +19,7 @@ For running an ML job you will need:
 
 ### 0.1: Create Azure ML workspace
 
-In [Azure Portal](https://portal.azure.com/) 
+In [Azure Portal]
 
 * Create a resource > Azure Machine learning
 * Resource group: **learn**
@@ -23,7 +28,7 @@ In [Azure Portal](https://portal.azure.com/)
 
 ### 0.2: Create Compute instance
 
-In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
+In [Azure ML Studio workspace]
 
 * Compute > + New
 * Compute name: **cheapest-instance** (must be unique in the whole region)
@@ -36,7 +41,7 @@ Now it is accessible in the job YAML file as `azureml:cheapest-instance`
 
 ### 0.3: Create Data asset (optional)
 
-In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
+In [Azure ML Studio workspace]
 
 * Data > (Data assets) > Create
 * Name: **diabetes-dev-dir**
@@ -102,7 +107,16 @@ We'll use `azure-cli` this time.
 
 ### 2.1: Create Service Principal
 
-In [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) register a new app or create a service principal directly with `azure-cli`
+* In [Azure Active Directory] register a new app:
+    * App registration > + New registration
+    * Name: **github-aml-sp**
+    * Register
+* In [Azure ML workspace](https://portal.azure.com/#@filippovolnygmail.onmicrosoft.com/resource/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourcegroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops/users) assign a role to the app:
+    * Access control (IAM) > + Add > Add role assignment > Contributor > Next
+    * + Select members > github-aml-sp > Select
+
+
+Create a service principal directly with `azure-cli`:
 
 ```
 az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops --sdk-auth
@@ -112,7 +126,7 @@ az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subsc
 
 ### 2.2: Create GitHub Action Secret
 
-* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings/secrets/actions) > New repository secret
+* [mslearn-mlops settings] > Secrets and variables > Actions > New repository secret
 * Name: **AZURE_CREDENTIALS**
 * Secret: [**\<output from the previous command\>**](#2.1:-create-service-principal)
 
@@ -120,7 +134,7 @@ az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subsc
 
 For some reason the service principal is only allowed to run jobs in compute cluster, not instance.
 
-In [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops)
+In [Azure ML Studio workspace]
 
 * Compute > Compute clusters > + New
 * Virtual machine size: **Standard_A1_v2** (1 cores, 2 GB RAM, 10 GB disk)
@@ -140,7 +154,7 @@ Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 
 ### 3.1: Create branch protection rule
 
-* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > Add branch protection rule
+* [mslearn-mlops settings] > Branches > Add branch protection rule
 * Branch name pattern: **main**
 * Require a pull request before merging > Require approvals
 * Create
@@ -217,7 +231,7 @@ jobs:
 
 The above created jobs `linting` and `unit-tests` must be specified in the required status checks inside the protection rule for the main branch
 
-* [mslearn-mlops settings](https://github.com/ficinator/mslearn-mlops/settings) > Branches > main branch protection rule
+* [mslearn-mlops settings] > Branches > main branch protection rule
 * Require status checks to pass before merging > Require branches to be up to date before merging 
 * Status checks that are required: **linting**, **unit-tests**
 
@@ -231,7 +245,7 @@ One can configure an environment with:
 * **secrets**: like repo secrets, but available only in the env
 
 Steps:
-* [mslearn-mlops settings ](https://github.com/ficinator/mslearn-mlops/settings) > Environments > New environment
+* [mslearn-mlops settings] > Environments > New environment
 * Name: **dev**
 * Configure environment
 * Add Secret
@@ -249,6 +263,7 @@ To use different data asset in each job, create an ML job file for each environm
 
 > TODO: check if one can reuse parts of ML jobs in the [docs](https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-overview)
 
+`src/job-dev.yml`
 ```yml
 inputs:
   training_data: 
@@ -270,6 +285,7 @@ The *prod* job runs only if the *dev* job finishes successfully (ML job ran succ
 * `needs` keyword to specify dependencies of the job
 * add `--stream` option to the ML job command to forward its output to GH
 
+`.github/workflows/05-trigger-ml-jobs.yml`
 ```yml
 on:
   push:
@@ -314,7 +330,7 @@ Now they can be ommited from subsequent `azure-cli` commands.
 
 ### 6.1.: Register a model
 
-In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+In the [Azure ML Studio workspace]:
 
 * Models > Register (From a job output)
 * check the latest `diabetes-prod-data-example` job > Next > Next
@@ -330,7 +346,7 @@ az ml model create --name sklearn-diabetes --type mlflow_model --path azureml://
 
 ### 6.2: Create an online (real-time) endpoint
 
-In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+In the [Azure ML Studio workspace]:
 
 * Endpoints > (Real-time endpoints) > Create (Real-time endpoint (quick))
 * Select a model: **sklearn-diabetes**
@@ -348,7 +364,7 @@ az ml online-deployment create --file src/deployment.yml --all-traffic
 
 ### 6.3: Invoke the endpoint
 
-In the [Azure ML Studio workspace](https://ml.azure.com/?tid=6571d690-b42e-4b19-90e7-d85b945aa165&wsid=/subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops):
+In the [Azure ML Studio workspace]:
 
 * Endpoints > mlops-diabetes > Test
 * copy the content of `experimentation/sample-request.json` file
@@ -362,4 +378,26 @@ az ml online-endpoint invoke --name mlops-diabetes --request-file experimentatio
 
 ### 6.4: Put everything into GH Action workflow
 
-TODO...
+* in the "Set up azure-cli" step the ml extension is installed and the default resource group and ML workspace are configured. Now we are able to drop these options from subsequent commands.
+* allow "Create endpoint" step to fail in case the endpoint already exists (not ideal, but I'm just learning) 
+
+`.github/workflows/06-deploy.yml`
+```yml
+jobs:
+  deploy:
+    ...
+    steps:
+    ...
+    - name: Set up azure-cli
+      run: |
+        az extension add -n ml -y
+        az configure --defaults workspace=mlops group=learn
+    - name: Create endpoint
+      run: az ml online-endpoint create --file src/endpoint.yml
+      continue-on-error: true
+    - name: Deploy model
+      run: az ml online-deployment create --file src/deployment.yml --all-traffic
+    - name: Test model
+      run: az ml online-endpoint invoke --name mlops-diabetes --request-file experimentation/sample-request.json 
+
+```

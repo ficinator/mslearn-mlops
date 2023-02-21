@@ -14,7 +14,7 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
-    - name: Set up az
+    - name: Set up azure-cli
       run: |
         az extension add -n ml -y
         az configure --defaults workspace=mlops group=learn
