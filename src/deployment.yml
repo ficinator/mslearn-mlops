@@ -2,5 +2,5 @@ $schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.sch
 name: sklearn-deployment
 endpoint_name: mlops-diabetes
 model: azureml:sklearn-diabetes:1
-instance_type: Standard_DS3_v2
+instance_type: Standard_DS2_v2
 instance_count: 1

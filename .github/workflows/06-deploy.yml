@@ -20,6 +20,7 @@ jobs:
         az configure --defaults workspace=mlops group=learn
     - name: Create endpoint
       run: az ml online-endpoint create --file src/endpoint.yml
+      continue-on-error: true
     - name: Deploy model
       run: az ml online-deployment create --file src/deployment.yml --all-traffic
     - name: Test model
