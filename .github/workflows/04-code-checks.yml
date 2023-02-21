@@ -17,7 +17,11 @@ jobs:
         python -m pip install flake8
     - name: Run linting tests
       run: | 
-        flake8 src/model/
+        flake8 \
+          --max-line-length=88 \
+          --extend-ignore=E203 \
+          src \
+          tests
 
   unit-tests:
     runs-on: ubuntu-latest

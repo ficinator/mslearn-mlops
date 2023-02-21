@@ -1,6 +1,8 @@
-from model.train import get_csvs_df
 import os
+
 import pytest
+
+from model.train import get_csvs_df
 
 
 def test_csvs_no_files():
@@ -17,6 +19,6 @@ def test_csvs_no_files_invalid_path():
 
 def test_csvs_creates_dataframe():
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    datasets_directory = os.path.join(current_directory, 'datasets')
+    datasets_directory = os.path.join(current_directory, "datasets")
     result = get_csvs_df(datasets_directory)
     assert len(result) == 20

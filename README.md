@@ -171,10 +171,11 @@ on: [pull_request]
 
 In the UI:
 
-* `pip install flake8 autopep8`
+* `pip install flake8 black`
 * Extensions > Python (`ms-python.python`) > Install
 * Settings (cogwheel)
 * Python > Linting: **Enabled**, **Flake8 Enabled**, **Lint On Save**
+* Python > Formatting > Provider: **black**
 * Python > Testing: **Pytest Enabled** 
 * Ctrl + Shift + P > Preferences: Configure Language Specific Settings... > Python
 * Editor: **Format On Save**, **Default Formatter: Pylance**
@@ -195,7 +196,8 @@ and add the following properties:
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
     },
-    "python.linting.flake8Enabled": true
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black"
 }
 
 ```
