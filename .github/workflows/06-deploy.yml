@@ -4,49 +4,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-endpoint:
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-    - name: Check out repo
-      uses: actions/checkout@main
-    - name: Install az ml extension
-      run: az extension add -n ml -y
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-        creds: ${{secrets.AZURE_CREDENTIALS}}
-    - name: Create endpoint
-      run: az ml online-endpoint create --file src/endpoint.yml
-
   deploy:
     runs-on: ubuntu-latest
-    environment: prod
-    needs: create-endpoint
+    environment: dev
     steps:
     - name: Check out repo
       uses: actions/checkout@main
-    - name: Install az ml extension
-      run: az extension add -n ml -y
     - name: Azure login
       uses: azure/login@v1
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: Set up az
+      run: |
+        az extension add -n ml -y
+        az configure --defaults workspace=mlops group=learn
+    - name: Create endpoint
+      run: az ml online-endpoint create --file src/endpoint.yml
     - name: Deploy model
       run: az ml online-deployment create --file src/deployment.yml --all-traffic
-
-  test:
-    runs-on: ubuntu-latest
-    environment: prod
-    needs: deploy
-    steps:
-    - name: Check out repo
-      uses: actions/checkout@main
-    - name: Install az ml extension
-      run: az extension add -n ml -y
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-        creds: ${{secrets.AZURE_CREDENTIALS}}
-    - name: Test deployed model
-      run: az ml online-endpoint invoke --name mlops-diabetes --request-file experimentation/sample-request.json
+    - name: Test model
+      run: az ml online-endpoint invoke --name mlops-diabetes --request-file experimentation/sample-request.json 
