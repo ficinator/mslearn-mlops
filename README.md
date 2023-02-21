@@ -376,6 +376,20 @@ In `azure-cli`:
 az ml online-endpoint invoke --name mlops-diabetes --request-file experimentation/sample-request.json
 ```
 
+In `curl`:
+
+* get credentials (key):
+    * in [Azure ML Studio workspace]: Endpoints > mlops-diabetes > Consume > Primary key
+    * or `ENDPOINT_CRED=$(az ml online-endpoint get-credentials --name mlops-diabetes --output tsv --query primaryKey)`
+
+* send the request
+    ```
+    curl -X POST https://mlops-diabetes.eastus2.inference.ml.azure.com/score \
+        -H "Authorization: Bearer $ENDPOINT_CRED" \
+        -H 'Content-Type: application/json' \
+        -d @experimentation/sample-request.json
+    ```
+
 ### 6.4: Put everything into GH Action workflow
 
 * in the "Set up azure-cli" step the ml extension is installed and the default resource group and ML workspace are configured. Now we are able to drop these options from subsequent commands.
