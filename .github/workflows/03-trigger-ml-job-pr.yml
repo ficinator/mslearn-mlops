@@ -17,4 +17,4 @@ jobs:
         az extension add -n ml -y
         az configure --defaults workspace=mlops group=learn
     - name: Create endpoint
-      run: az ml job create --file job.yml
+      run: az ml job create --file src/job.yml
