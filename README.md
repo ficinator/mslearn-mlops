@@ -69,6 +69,8 @@ We'll use `azure-cli` this time.
 
 ### 1.1: Install `azure-cli`
 
+Find your environment in the [install page](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) or read below for Ubuntu/Debian.
+
 1. download MS keyring
     ```
     curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/microsoft.gpg > /dev/null
@@ -122,7 +124,7 @@ Create a service principal directly with `azure-cli`:
 az ad sp create-for-rbac --name github-aml-sp --role contributor --scopes /subscriptions/b42b69cf-27c0-4ee2-99a0-a718ebd91945/resourceGroups/learn/providers/Microsoft.MachineLearningServices/workspaces/mlops --sdk-auth
 ```
 
-> no idea what `--sdk-auth` means, but it is deprecated
+> TODO: what to use once deprecated `--sdk-auth` option is removed?
 
 ### 2.2: Create GitHub Action Secret
 
@@ -146,7 +148,7 @@ Now it is accessible in the job YAML file as `azureml:cheapest-cluster`
 
 > **important**: do not forget to stop it after you're done!
 
-### 2.4: Run GH Action
+### 2.4: Run GH Action manually
 
 * [mslearn-mlops action](https://github.com/ficinator/mslearn-mlops/actions/workflows/02-manual-trigger-job.yml) > Run workflow > hopefully it runs
 
