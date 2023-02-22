@@ -16,5 +16,5 @@ jobs:
       run: |
         az extension add -n ml -y
         az configure --defaults workspace=mlops group=learn
-    - name: Create endpoint
+    - name: Trigger ML job
       run: az ml job create --file src/job.yml
