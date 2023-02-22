@@ -3,7 +3,7 @@ name: Trigger AML job on PR
 on: [pull_request]
 
 jobs:
-  deploy:
+  train:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repo
