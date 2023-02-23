@@ -3,7 +3,7 @@ name: Trigger AML job on PR
 on: [pull_request]
 
 jobs:
-  deploy:
+  train:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repo
@@ -16,5 +16,5 @@ jobs:
       run: |
         az extension add -n ml -y
         az configure --defaults workspace=mlops group=learn
-    - name: Create endpoint
-      run: az ml job create --file job.yml
+    - name: Trigger ML job
+      run: az ml job create --file src/job.yml

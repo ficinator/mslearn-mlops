@@ -1,0 +1,4 @@
+$schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
+name: diabetes-prod-folder
+type: uri_folder
+path: ../production/data

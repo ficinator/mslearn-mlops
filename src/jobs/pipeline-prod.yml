@@ -1,0 +1,19 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+
+inputs:
+  training_data: 
+    path: azureml:diabetes-prod-folder:1
+    mode: ro_mount
+  reg_rate: 0.01
+
+jobs:
+  train:
+    component: azureml://registries/learn-mlops/components/train_diabetes_model/versions/1
+    inputs:
+        training_data: ${{parent.inputs.training_data}}
+        reg_rate: ${{parent.inputs.reg_rate}}
+    compute: azureml:cheapest-cluster
+
+experiment_name: diabetes-prod-data-example
+description: Train a classification model on diabetes data using a registered dataset as input.

@@ -132,4 +132,4 @@ dmypy.json
 mlruns/
 
 # azure
-azure_credentials.json
+azure-credentials*.json
