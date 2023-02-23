@@ -1,0 +1,50 @@
+name: Train dev and prod
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@main
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: Set up azure-cli
+      run: |
+        az extension add -n ml -y
+        az configure --defaults workspace=mlops group=learn
+    - name: Trigger ML job
+      run: |
+        az ml job create \
+        --file src/jobs/pipeline-dev.yml \
+        --stream
+
+  production:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: experiment
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@main
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+
+    - name: Set up azure-cli
+      run: |
+        az extension add -n ml -y
+        az configure --defaults workspace=learn-prod group=learn
+    - name: Trigger ML job
+      run: |
+        az ml job create \
+        --file src/jobs/pipeline-prod.yml \
+        --stream
