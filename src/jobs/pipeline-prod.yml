@@ -2,7 +2,8 @@ $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
 
 inputs:
-  training_data: 
+  training_data:
+    type: uri_folder
     path: azureml:diabetes-prod-folder:1
     mode: ro_mount
   reg_rate: 0.01
