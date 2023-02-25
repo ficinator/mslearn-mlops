@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 # define functions
 def main(args):
     # TO DO: enable autologging
-    mlflow.autolog()
+    mlflow.autolog(log_models=False)
 
     # read data
     df = get_csvs_df(args.training_data)
@@ -22,7 +22,14 @@ def main(args):
     X_train, X_test, y_train, y_test = split_data(df)
 
     # train model
-    train_model(args.reg_rate, X_train, X_test, y_train, y_test)
+    model = train_model(args.reg_rate, X_train, X_test, y_train, y_test)
+
+    # register model
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        registered_model_name=args.model_name,
+        artifact_path=args.model_name,
+    )
 
 
 def get_csvs_df(path):
@@ -55,8 +62,10 @@ def split_data(df):
 
 
 def train_model(reg_rate, X_train, X_test, y_train, y_test):
+    model = LogisticRegression(C=1 / reg_rate, solver="liblinear")
     # train model
-    LogisticRegression(C=1 / reg_rate, solver="liblinear").fit(X_train, y_train)
+    model.fit(X_train, y_train)
+    return model
 
 
 def parse_args():
@@ -66,6 +75,9 @@ def parse_args():
     # add arguments
     parser.add_argument("--training_data", dest="training_data", type=str)
     parser.add_argument("--reg_rate", dest="reg_rate", type=float, default=0.01)
+    parser.add_argument(
+        "--model_name", dest="model_name", type=str, default="diabetes-sklearn-log-reg"
+    )
 
     # parse args
     args = parser.parse_args()

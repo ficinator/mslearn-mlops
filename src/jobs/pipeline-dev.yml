@@ -10,7 +10,7 @@ inputs:
 
 jobs:
   train:
-    component: azureml://registries/learn-mlops/components/train_diabetes_model/versions/1
+    component: azureml://registries/learn-mlops/components/train_diabetes_model/versions/2023-02-25-00-01-54-9006749
     inputs:
         training_data: ${{parent.inputs.training_data}}
         reg_rate: ${{parent.inputs.reg_rate}}
